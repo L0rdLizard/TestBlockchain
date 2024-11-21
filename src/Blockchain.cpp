@@ -4,7 +4,7 @@
 void Blockchain::addTransaction(const Transaction& transaction) {
     const double minBalance = 0.01;
 
-    if ((getWalletBalance(transaction.sender) - transaction.amount < minBalance) && (transaction.sender != "Genesis")) {
+    if ((getWalletBalance(transaction.sender) - transaction.amount < minBalance) && (transaction.sender != "GENESIS")) {
         throw std::runtime_error("Transaction denied! Sender balance would fall below the minimum allowed.");
     }
 
@@ -39,10 +39,22 @@ void Blockchain::printAllTransactions() const {
 
 void Blockchain::getBlockchainStats() const {
     size_t totalTransactions = transactions.size();
-    double totalAmount = 0;
+    std::map<std::string, double> balances;
+
+    const std::string GENESIS_ADDRESS = "GENESIS";
+
     for (const auto& transaction : transactions) {
-        totalAmount += transaction.amount;
+        if (transaction.sender != GENESIS_ADDRESS) {
+            balances[transaction.sender] -= transaction.amount;
+        }
+        balances[transaction.receiver] += transaction.amount;
     }
+
+    double totalAmount = 0;
+    for (const auto& [wallet, balance] : balances) {
+        totalAmount += balance;
+    }
+
     std::cout << "Total Transactions: " << totalTransactions << "\n"
-            << "Total Amount: " << totalAmount << "\n";
+                << "Total Amount in System: " << totalAmount << "\n";
 }

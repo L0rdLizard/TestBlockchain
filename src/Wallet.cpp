@@ -3,7 +3,7 @@
 
 Wallet::Wallet(const std::string& address, Blockchain& blockchain, double amount)
     : address(address), blockchain(blockchain) {
-        Transaction transaction( "Genesis", address, amount);
+        Transaction transaction( "GENESIS", address, amount);
         blockchain.addTransaction(transaction);
         updateBalance(amount);
     }
