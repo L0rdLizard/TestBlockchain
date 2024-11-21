@@ -2,25 +2,32 @@
 
 
 void Blockchain::addTransaction(const Transaction& transaction) {
-    if (walletBalances[transaction.sender] < transaction.amount) {
-        throw std::runtime_error("Insufficient funds for transaction!");
+    const double minBalance = 0.01;
+
+    if ((getWalletBalance(transaction.sender) - transaction.amount < minBalance) && (transaction.sender != "Genesis")) {
+        throw std::runtime_error("Transaction denied! Sender balance would fall below the minimum allowed.");
+    }
+
+    if (transaction.amount <= 0) {
+        throw std::runtime_error("Transaction amount must be positive!");
     }
 
     transactions.push_back(transaction);
-    walletBalances[transaction.sender] -= transaction.amount;
-    walletBalances[transaction.receiver] += transaction.amount;
 }
 
 double Blockchain::getWalletBalance(const std::string& walletAddress) const {
-    auto it = walletBalances.find(walletAddress);
-    return it != walletBalances.end() ? it->second : 0.0;
-}
+    double balance = 0.0;
 
-void Blockchain::registerWallet(const std::string& walletAddress, double initialBalance = 0.0) {
-    if (walletBalances.count(walletAddress)) {
-        throw std::runtime_error("Wallet already exists!");
+    for (const auto& transaction : transactions) {
+        if (transaction.receiver == walletAddress) {
+            balance += transaction.amount;
+        }
+        if (transaction.sender == walletAddress) {
+            balance -= transaction.amount;
+        }
     }
-    walletBalances[walletAddress] = initialBalance;
+
+    return balance;
 }
 
 void Blockchain::printAllTransactions() const {
