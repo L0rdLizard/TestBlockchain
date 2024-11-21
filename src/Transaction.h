@@ -15,7 +15,9 @@ struct Transaction
     time_t timestamp;
 
     Transaction(const std::string &sender, const std::string &receiver, double amount)
-        : sender(sender), receiver(receiver), amount(amount), timestamp(std::time(nullptr)) {}
+        : sender(sender), receiver(receiver), amount(amount), timestamp(std::time(nullptr)) {
+            
+        }
 
     void printTransaction() const
     {
